@@ -11,7 +11,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import lockfile from 'proper-lockfile';
 import { nanoid } from 'nanoid';
 
@@ -60,13 +60,12 @@ class Collection {
     }
   }
 
-  _writeFileSync(data) {
+ _writeFileSync(data) {
     const dir = path.dirname(this.filePath);
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
-    const fs = require('fs');
-    fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2), 'utf-8');
+    writeFileSync(this.filePath, JSON.stringify(data, null, 2), 'utf-8');
   }
 
   // Build indexes for fast lookups
