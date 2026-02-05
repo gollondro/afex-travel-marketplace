@@ -1,5 +1,4 @@
-# AFEX Travel Marketplace - Render Blueprint
-# Deploy both API and Web services with this file
+# AFEX Travel Marketplace - Render Blueprint (Free Tier)
 
 services:
   # Backend API (Node.js + Express)
@@ -24,13 +23,9 @@ services:
       - key: APP_URL
         value: https://afexgo-travel-api.onrender.com
       - key: DATA_DIR
-        value: /var/data
+        value: ./data
       - key: PAYMENT_WEBHOOK_SECRET
         generateValue: true
-    disk:
-      name: afex-data
-      mountPath: /var/data
-      sizeGB: 1
 
   # Frontend Web (Next.js)
   - type: web
@@ -41,7 +36,6 @@ services:
     rootDir: web
     buildCommand: npm install && npm run build
     startCommand: npm start
-    healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
