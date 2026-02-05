@@ -1,7 +1,7 @@
 # AFEX Travel Marketplace - Render Blueprint (Free Tier)
 
 services:
-  # Backend API (Node.js + Express)
+  # Backend API
   - type: web
     name: afexgo-travel-api
     runtime: node
@@ -14,6 +14,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: 18.19.0
       - key: PORT
         value: 3001
       - key: JWT_SECRET
@@ -27,17 +29,23 @@ services:
       - key: PAYMENT_WEBHOOK_SECRET
         generateValue: true
 
-  # Frontend Web (Next.js)
+  # Frontend Web
   - type: web
     name: afexgo-travel-web
     runtime: node
     region: oregon
     plan: free
     rootDir: web
-    buildCommand: npm install && npm run build
+    buildCommand: rm -rf node_modules && npm install && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: 18.19.0
+      - key: NPM_CONFIG_PRODUCTION
+        value: false
       - key: NEXT_PUBLIC_API_URL
         value: https://afexgo-travel-api.onrender.com
+      - key: PORT
+        value: 10000
