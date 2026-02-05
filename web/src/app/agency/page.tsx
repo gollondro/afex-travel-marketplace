@@ -41,7 +41,7 @@ export default function AgencyDashboardPage() {
         ordersAPI.getMyOrders(token, { limit: 5 }),
       ]);
       
-      setStats(profileRes.stats as Stats);
+	  setStats(profileRes.stats as unknown as Stats);
       setRecentPrograms(programsRes.programs.slice(0, 3));
       setRecentOrders(ordersRes.orders);
     } catch (error) {
