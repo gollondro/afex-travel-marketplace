@@ -40,7 +40,7 @@ export default function AdminDashboardPage() {
         ordersAPI.getAllOrders(token, { limit: 5 }),
       ]);
       
-      setStats(profileRes.stats as AdminStats);
+	  setStats(profileRes.stats as unknown as AdminStats);
       setRecentAgencies(agenciesRes.agencies.slice(0, 5));
       setRecentOrders(ordersRes.orders);
     } catch (error) {
