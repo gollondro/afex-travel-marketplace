@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { Star, Globe, DollarSign, Heart, QrCode, Share2, CheckCircle } from 'lucide-react';
+import { Star, Globe, DollarSign, Heart, QrCode, Share2 } from 'lucide-react';
 import { Button, Card, Input, Spinner, Alert } from '@/components/ui';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://afexgo-travel-api.onrender.com';
+
+// Tipo de cambio aproximado USD -> CLP (actualizar según necesidad)
+const USD_TO_CLP = 950;
 
 interface Guide {
   id: string;
@@ -31,6 +33,15 @@ const PAYMENT_METHOD_INFO: Record<string, { label: string; icon: string; color: 
 
 const SUGGESTED_AMOUNTS = [5, 10, 20, 50];
 
+function formatCLP(amount: number): string {
+  return new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 export default function GuidePublicPage() {
   const params = useParams();
   const router = useRouter();
@@ -47,6 +58,9 @@ export default function GuidePublicPage() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Calcular equivalente en CLP
+  const amountCLP = amount * USD_TO_CLP;
 
   useEffect(() => {
     if (params.id) {
@@ -124,7 +138,6 @@ export default function GuidePublicPage() {
         throw new Error(data.error || 'Error al procesar');
       }
 
-      // Redirect to payment page
       router.push(`/guides/${guide.id}/pay?tip=${data.tip.id}&method=${selectedMethod}&amount=${amount}`);
     } catch (err: any) {
       setError(err.message);
@@ -175,11 +188,10 @@ export default function GuidePublicPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-600 to-primary-800">
+    <div className="min-h-screen bg-gradient-to-b from-green-600 to-green-800">
       {/* Header with Guide Info */}
       <div className="relative pt-8 pb-24 px-4">
         <div className="max-w-md mx-auto text-center text-white">
-          {/* Share button */}
           <button
             onClick={handleShare}
             className="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
@@ -187,12 +199,10 @@ export default function GuidePublicPage() {
             <Share2 className="w-5 h-5" />
           </button>
 
-          {/* QR Icon */}
           <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
             <QrCode className="w-6 h-6" />
           </div>
 
-          {/* Guide Photo */}
           <div className="relative w-28 h-28 mx-auto mb-4">
             {guide.photo_url ? (
               <img
@@ -209,7 +219,7 @@ export default function GuidePublicPage() {
 
           <h1 className="text-2xl font-bold mb-1">{guide.name}</h1>
           
-          <div className="flex items-center justify-center gap-4 text-primary-100 text-sm mb-4">
+          <div className="flex items-center justify-center gap-4 text-green-100 text-sm mb-4">
             <div className="flex items-center">
               <Star className="w-4 h-4 mr-1 fill-yellow-400 text-yellow-400" />
               {guide.rating.toFixed(1)}
@@ -221,16 +231,16 @@ export default function GuidePublicPage() {
           </div>
 
           {guide.bio && (
-            <p className="text-primary-100 text-sm mb-4 max-w-xs mx-auto">
+            <p className="text-green-100 text-sm mb-4 max-w-xs mx-auto">
               {guide.bio}
             </p>
           )}
 
           {guide.languages.length > 0 && (
             <div className="flex items-center justify-center gap-2 flex-wrap">
-              <Globe className="w-4 h-4 text-primary-200" />
+              <Globe className="w-4 h-4 text-green-200" />
               {guide.languages.map((lang, i) => (
-                <span key={lang} className="text-sm text-primary-100">
+                <span key={lang} className="text-sm text-green-100">
                   {lang}{i < guide.languages.length - 1 ? ',' : ''}
                 </span>
               ))}
@@ -243,7 +253,7 @@ export default function GuidePublicPage() {
       <div className="px-4 -mt-16 pb-8">
         <Card className="max-w-md mx-auto p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <DollarSign className="w-5 h-5 mr-2 text-primary-500" />
+            <DollarSign className="w-5 h-5 mr-2 text-green-500" />
             Enviar Propina
           </h2>
 
@@ -264,7 +274,7 @@ export default function GuidePublicPage() {
                   onClick={() => handleAmountSelect(value)}
                   className={`py-3 rounded-lg font-medium transition-colors ${
                     amount === value && !customAmount
-                      ? 'bg-primary-500 text-white'
+                      ? 'bg-green-500 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -280,6 +290,20 @@ export default function GuidePublicPage() {
               onChange={handleCustomAmountChange}
               error={formErrors.amount}
             />
+            
+            {/* Equivalente en CLP */}
+            {amount > 0 && (
+              <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-sm text-green-700">
+                  <span className="font-medium">${amount} USD</span>
+                  {' '}≈{' '}
+                  <span className="font-bold text-green-800">{formatCLP(amountCLP)}</span>
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  Tipo de cambio referencial: 1 USD = {formatCLP(USD_TO_CLP)}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Payment Method Selection */}
@@ -300,7 +324,7 @@ export default function GuidePublicPage() {
                     onClick={() => setSelectedMethod(method)}
                     className={`p-3 rounded-lg border-2 text-left transition-all ${
                       selectedMethod === method
-                        ? 'border-primary-500 bg-primary-50'
+                        ? 'border-green-500 bg-green-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -338,20 +362,20 @@ export default function GuidePublicPage() {
                 placeholder="¡Gracias por el excelente tour!"
                 rows={2}
                 maxLength={200}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
           </div>
 
           {/* Submit Button */}
           <Button
-            className="w-full"
+            className="w-full bg-green-600 hover:bg-green-700"
             size="lg"
             onClick={handleSubmit}
             isLoading={isSubmitting}
           >
             <Heart className="w-5 h-5 mr-2" />
-            Enviar ${amount} USD
+            Enviar ${amount} USD ({formatCLP(amountCLP)})
           </Button>
 
           <p className="text-xs text-gray-500 text-center mt-4">
@@ -361,7 +385,7 @@ export default function GuidePublicPage() {
       </div>
 
       {/* Footer */}
-      <div className="text-center py-6 text-primary-200 text-sm">
+      <div className="text-center py-6 text-green-200 text-sm">
         <p>Powered by <strong>AFEX Go Travel</strong></p>
       </div>
     </div>
