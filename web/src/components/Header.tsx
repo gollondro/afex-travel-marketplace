@@ -41,7 +41,9 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link href="/" className="text-gray-600 hover:text-gray-900 font-medium">
               Programas
-            </Link>
+            </Link>  <Link href="/guides/register" className="text-gray-600 hover:text-gray-900 font-medium">
+  Soy Guía
+</Link>
             
             {isAuthenticated ? (
               <>
@@ -52,9 +54,7 @@ export function Header() {
                   <LayoutDashboard className="w-4 h-4 mr-1" />
                   Dashboard
                 </Link>
-                  <Link href="/guides/register" className="text-gray-600 hover:text-gray-900 font-medium">
-  Soy Guía
-</Link>
+                
                 <div className="flex items-center space-x-4 pl-4 border-l border-gray-200">
                   <div className="flex items-center">
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
