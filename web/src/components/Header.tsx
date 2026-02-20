@@ -29,9 +29,7 @@ export function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-		  <Link href="/guides/register" className="text-gray-600 hover:text-gray-900 font-medium">
-  Soy Guía
-</Link>
+		
             <Plane className="w-8 h-8 text-blue-600" />
             <div>
               <span className="text-xl font-bold text-gray-900">AFEX Travel</span>
@@ -54,7 +52,9 @@ export function Header() {
                   <LayoutDashboard className="w-4 h-4 mr-1" />
                   Dashboard
                 </Link>
-                
+                  <Link href="/guides/register" className="text-gray-600 hover:text-gray-900 font-medium">
+  Soy Guía
+</Link>
                 <div className="flex items-center space-x-4 pl-4 border-l border-gray-200">
                   <div className="flex items-center">
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
