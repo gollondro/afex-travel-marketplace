@@ -41,9 +41,21 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link href="/" className="text-gray-600 hover:text-gray-900 font-medium">
               Programas
-            </Link>  <Link href="/guides/register" className="text-gray-600 hover:text-gray-900 font-medium">
-  Soy Guía
-</Link>
+            </Link> 
+			
+			<div className="relative group">
+  <button className="text-gray-600 hover:text-gray-900 font-medium">
+    Guías
+  </button>
+  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+    <Link href="/guides/register" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg">
+      Registrarme como Guía
+    </Link>
+    <Link href="/guides/login" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg">
+      Portal de Guías
+    </Link>
+  </div>
+</div>
             
             {isAuthenticated ? (
               <>

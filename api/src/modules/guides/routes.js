@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import config from '../../config/index.js';
 import { getStorage } from '../../storage/index.js';
@@ -8,6 +9,7 @@ import { logger } from '../../middleware/errorHandler.js';
 
 const router = Router();
 
+// Schemas
 const registerGuideSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -24,6 +26,11 @@ const registerGuideSchema = z.object({
   }),
 });
 
+const loginGuideSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
 const tipSchema = z.object({
   amount_usd: z.number().min(1),
   payment_method: z.enum(['pix', 'qr_argentina', 'yape', 'plin', 'zelle', 'venmo', 'bizum']),
@@ -32,6 +39,7 @@ const tipSchema = z.object({
   message: z.string().max(200).optional(),
 });
 
+// Middleware de validación
 const validate = (schema) => (req, res, next) => {
   try {
     req.validated = schema.parse(req.body);
@@ -47,7 +55,49 @@ const validate = (schema) => (req, res, next) => {
   }
 };
 
-// GET /api/guides/public/:id
+// Middleware de autenticación para guías
+const authenticateGuide = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No autorizado' });
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, config.jwtSecret);
+
+    if (decoded.type !== 'guide') {
+      return res.status(401).json({ error: 'Token inválido' });
+    }
+
+    const storage = getStorage();
+    const guide = await storage.guides.findById(decoded.guideId);
+
+    if (!guide || guide.status !== 'active') {
+      return res.status(401).json({ error: 'Guía no encontrado' });
+    }
+
+    req.guide = guide;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Token inválido o expirado' });
+  }
+};
+
+// Generar token JWT para guía
+const generateGuideToken = (guide) => {
+  return jwt.sign(
+    { guideId: guide.id, email: guide.email, type: 'guide' },
+    config.jwtSecret,
+    { expiresIn: '7d' }
+  );
+};
+
+// ==================
+// RUTAS PÚBLICAS
+// ==================
+
+// GET /api/guides/public/:id - Perfil público
 router.get('/public/:id', async (req, res, next) => {
   try {
     const storage = getStorage();
@@ -73,7 +123,7 @@ router.get('/public/:id', async (req, res, next) => {
   }
 });
 
-// POST /api/guides/register
+// POST /api/guides/register - Registro
 router.post('/register', validate(registerGuideSchema), async (req, res, next) => {
   try {
     const data = req.validated;
@@ -105,6 +155,7 @@ router.post('/register', validate(registerGuideSchema), async (req, res, next) =
 
     logger.info('Guide registered', { guide_id: guide.id });
 
+    const token = generateGuideToken(guide);
     const { password_hash: _, bank_details: __, ...publicGuide } = guide;
     const webUrl = process.env.CORS_ORIGIN || 'https://afexgo-travel-web-o6pf.onrender.com';
 
@@ -112,6 +163,7 @@ router.post('/register', validate(registerGuideSchema), async (req, res, next) =
       success: true,
       message: 'Guía registrado exitosamente',
       guide: publicGuide,
+      token,
       qr_url: `${webUrl}/guides/${guide.id}`,
     });
   } catch (error) {
@@ -119,7 +171,43 @@ router.post('/register', validate(registerGuideSchema), async (req, res, next) =
   }
 });
 
-// POST /api/guides/:id/tip
+// POST /api/guides/login - Login
+router.post('/login', validate(loginGuideSchema), async (req, res, next) => {
+  try {
+    const { email, password } = req.validated;
+    const storage = getStorage();
+
+    const guide = await storage.guides.findOne(g => g.email === email);
+    if (!guide) {
+      return res.status(401).json({ error: 'Email o contraseña incorrectos' });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, guide.password_hash);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Email o contraseña incorrectos' });
+    }
+
+    if (guide.status !== 'active') {
+      return res.status(403).json({ error: 'Cuenta desactivada' });
+    }
+
+    const token = generateGuideToken(guide);
+    const { password_hash: _, ...guideWithoutPassword } = guide;
+
+    logger.info('Guide logged in', { guide_id: guide.id });
+
+    res.json({
+      success: true,
+      message: 'Login exitoso',
+      guide: guideWithoutPassword,
+      token,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/guides/:id/tip - Crear propina
 router.post('/:id/tip', validate(tipSchema), async (req, res, next) => {
   try {
     const data = req.validated;
@@ -153,7 +241,7 @@ router.post('/:id/tip', validate(tipSchema), async (req, res, next) => {
   }
 });
 
-// POST /api/guides/tips/:tipId/confirm
+// POST /api/guides/tips/:tipId/confirm - Confirmar propina
 router.post('/tips/:tipId/confirm', async (req, res, next) => {
   try {
     const storage = getStorage();
@@ -181,6 +269,131 @@ router.post('/tips/:tipId/confirm', async (req, res, next) => {
     }
 
     res.json({ success: true, message: '¡Propina enviada!', tip: updatedTip });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ==================
+// RUTAS AUTENTICADAS (Dashboard del Guía)
+// ==================
+
+// GET /api/guides/me - Perfil del guía autenticado
+router.get('/me', authenticateGuide, async (req, res) => {
+  const { password_hash, ...guideWithoutPassword } = req.guide;
+  res.json({ success: true, guide: guideWithoutPassword });
+});
+
+// GET /api/guides/me/stats - Estadísticas del guía
+router.get('/me/stats', authenticateGuide, async (req, res, next) => {
+  try {
+    const storage = getStorage();
+    const tips = await storage.tips.findMany(t => t.guide_id === req.guide.id);
+
+    const completedTips = tips.filter(t => t.status === 'completed');
+    const pendingTips = tips.filter(t => t.status === 'pending');
+
+    // Calcular propinas del mes actual
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thisMonthTips = completedTips.filter(t => new Date(t.completed_at) >= startOfMonth);
+    const thisMonthTotal = thisMonthTips.reduce((sum, t) => sum + t.amount_usd, 0);
+
+    // Calcular por método de pago
+    const byPaymentMethod = {};
+    completedTips.forEach(tip => {
+      if (!byPaymentMethod[tip.payment_method]) {
+        byPaymentMethod[tip.payment_method] = { count: 0, total: 0 };
+      }
+      byPaymentMethod[tip.payment_method].count++;
+      byPaymentMethod[tip.payment_method].total += tip.amount_usd;
+    });
+
+    res.json({
+      success: true,
+      stats: {
+        total_tips: completedTips.length,
+        total_usd: req.guide.total_tips_usd || 0,
+        pending_tips: pendingTips.length,
+        this_month_tips: thisMonthTips.length,
+        this_month_usd: thisMonthTotal,
+        rating: req.guide.rating || 5.0,
+        by_payment_method: byPaymentMethod,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/guides/me/tips - Lista de propinas del guía
+router.get('/me/tips', authenticateGuide, async (req, res, next) => {
+  try {
+    const storage = getStorage();
+    const { status, page = 1, limit = 20 } = req.query;
+
+    let tips = await storage.tips.findMany(t => t.guide_id === req.guide.id);
+
+    // Filtrar por status
+    if (status && ['pending', 'completed'].includes(status)) {
+      tips = tips.filter(t => t.status === status);
+    }
+
+    // Ordenar por fecha (más recientes primero)
+    tips.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Paginación
+    const total = tips.length;
+    const totalPages = Math.ceil(total / limit);
+    const offset = (page - 1) * limit;
+    const paginatedTips = tips.slice(offset, offset + parseInt(limit));
+
+    res.json({
+      success: true,
+      tips: paginatedTips.map(t => ({
+        id: t.id,
+        amount_usd: t.amount_usd,
+        payment_method: t.payment_method,
+        sender_name: t.sender_name,
+        message: t.message,
+        status: t.status,
+        created_at: t.created_at,
+        completed_at: t.completed_at,
+      })),
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT /api/guides/me - Actualizar perfil del guía
+router.put('/me', authenticateGuide, async (req, res, next) => {
+  try {
+    const storage = getStorage();
+    const { name, phone, bio, languages, photo_url, bank_details } = req.body;
+
+    const updates = {};
+    if (name) updates.name = name;
+    if (phone) updates.phone = phone;
+    if (bio !== undefined) updates.bio = bio;
+    if (languages) updates.languages = languages;
+    if (photo_url !== undefined) updates.photo_url = photo_url;
+    if (bank_details) updates.bank_details = bank_details;
+
+    const updatedGuide = await storage.guides.update(req.guide.id, updates);
+    const { password_hash, ...guideWithoutPassword } = updatedGuide;
+
+    res.json({
+      success: true,
+      message: 'Perfil actualizado',
+      guide: guideWithoutPassword,
+    });
   } catch (error) {
     next(error);
   }
