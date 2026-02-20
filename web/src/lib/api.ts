@@ -295,4 +295,118 @@ export const usersAPI = {
     request<{ user: User; stats: Record<string, number> }>('/api/users/profile', { token }),
 };
 
+// ==================
+// Guides API
+// ==================
+
+export interface Guide {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  photo_url?: string | null;
+  bio?: string;
+  languages: string[];
+  qr_code?: string;
+  payment_methods: string[];
+  tips_count: number;
+  rating: number;
+  status?: string;
+  created_at?: string;
+}
+
+export interface Tip {
+  id: string;
+  guide_id: string;
+  amount_usd: number;
+  payment_method: string;
+  sender_name: string;
+  sender_email?: string;
+  message?: string;
+  status: 'pending' | 'completed';
+  created_at: string;
+}
+
+export interface GuideRegisterData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  photo_url?: string;
+  bio?: string;
+  languages?: string[];
+  bank_details: {
+    bank_name: string;
+    account_type: 'checking' | 'savings';
+    account_number: string;
+    account_holder: string;
+  };
+}
+
+export interface TipData {
+  amount_usd: number;
+  payment_method: string;
+  sender_name: string;
+  sender_email?: string;
+  message?: string;
+}
+
+export interface PaymentDetails {
+  method: string;
+  label: string;
+  key?: string;
+  alias?: string;
+  phone?: string;
+  email?: string;
+  username?: string;
+  instructions?: string;
+}
+
+export const guidesAPI = {
+  getPublicProfile: (id: string) =>
+    request<{ success: boolean; guide: Guide }>(`/api/guides/public/${id}`),
+
+  register: (data: GuideRegisterData) =>
+    request<{
+      success: boolean;
+      message: string;
+      guide: Guide;
+      qr_url: string;
+    }>('/api/guides/register', {
+      method: 'POST',
+      body: data,
+    }),
+
+  createTip: (guideId: string, data: TipData) =>
+    request<{
+      success: boolean;
+      tip: Tip;
+      payment_details: PaymentDetails;
+    }>(`/api/guides/${guideId}/tip`, {
+      method: 'POST',
+      body: data,
+    }),
+
+  confirmTip: (tipId: string) =>
+    request<{
+      success: boolean;
+      message: string;
+      tip: Tip;
+    }>(`/api/guides/tips/${tipId}/confirm`, {
+      method: 'POST',
+    }),
+
+  getStats: (guideId: string) =>
+    request<{
+      success: boolean;
+      stats: {
+        tips_count: number;
+        total_tips_usd: number;
+        this_month: number;
+        rating: number;
+      };
+      recent_tips: Tip[];
+    }>(`/api/guides/${guideId}/stats`),
+};
+
 export { APIError };
