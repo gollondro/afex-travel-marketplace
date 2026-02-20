@@ -87,7 +87,81 @@ async function seed() {
     image_url: 'https://images.unsplash.com/photo-1509267025891-a267c8679ae9?w=800'
   });
   console.log(`   ✓ Program created: ${program2.name}`);
-  
+  // Seed Guides
+const guidesData = [
+  {
+    id: 'guide-carlos-01',
+    email: 'carlos.mendez@email.com',
+    password_hash: '$2b$10$XvJ1QK5VQK5VQK5VQK5VQOxJ1QK5VQK5VQK5VQK5VQK5VQK5VQK', // password: guide123
+    name: 'Carlos Méndez',
+    phone: '+56912345678',
+    photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+    bio: 'Guía turístico profesional con 10 años de experiencia en Torres del Paine y Patagonia.',
+    languages: ['Español', 'English', 'Português'],
+    bank_details: {
+      bank_name: 'Banco Estado',
+      account_type: 'checking',
+      account_number: '123456789',
+      account_holder: 'Carlos Méndez'
+    },
+    qr_code: 'carlos-mendez-qr',
+    status: 'active',
+    tips_count: 47,
+    total_tips_usd: 892,
+    rating: 4.9
+  },
+  {
+    id: 'guide-maria-02',
+    email: 'maria.silva@email.com',
+    password_hash: '$2b$10$XvJ1QK5VQK5VQK5VQK5VQOxJ1QK5VQK5VQK5VQK5VQK5VQK5VQK',
+    name: 'María Silva',
+    phone: '+5491155667788',
+    photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+    bio: 'Especialista en ecoturismo y avistamiento de fauna en la Patagonia Argentina.',
+    languages: ['Español', 'English'],
+    bank_details: {
+      bank_name: 'Banco Nación',
+      account_type: 'savings',
+      account_number: '987654321',
+      account_holder: 'María Silva'
+    },
+    qr_code: 'maria-silva-qr',
+    status: 'active',
+    tips_count: 32,
+    total_tips_usd: 645,
+    rating: 4.8
+  },
+  {
+    id: 'guide-pedro-03',
+    email: 'pedro.rojas@email.com',
+    password_hash: '$2b$10$XvJ1QK5VQK5VQK5VQK5VQOxJ1QK5VQK5VQK5VQK5VQK5VQK5VQK',
+    name: 'Pedro Rojas',
+    phone: '+51987654321',
+    photo_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+    bio: 'Guía de montaña certificado. Experto en trekking y expediciones de alta montaña.',
+    languages: ['Español', 'English', 'Français'],
+    bank_details: {
+      bank_name: 'BCP',
+      account_type: 'savings',
+      account_number: '456789123',
+      account_holder: 'Pedro Rojas'
+    },
+    qr_code: 'pedro-rojas-qr',
+    status: 'active',
+    tips_count: 58,
+    total_tips_usd: 1230,
+    rating: 5.0
+  }
+];
+
+// Add guides seeding in the seed function
+for (const guide of guidesData) {
+  const existing = await storage.guides.findOne(g => g.email === guide.email);
+  if (!existing) {
+    await storage.guides.create(guide);
+    console.log(`✅ Guide seeded: ${guide.name}`);
+  }
+}
   // Programs for Agency 2
   const program3 = await storage.programs.create({
     agency_id: agency2.id,
