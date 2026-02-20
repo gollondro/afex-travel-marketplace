@@ -141,7 +141,7 @@ app.get('/api', (req, res) => {
       users: '/api/users',
       programs: '/api/programs',
       orders: '/api/orders',
-      payments: '/api/payments'
+      payments: '/api/payments',
 	  guides: '/api/guides'
     }
   });
