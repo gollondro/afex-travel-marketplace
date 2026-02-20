@@ -33,7 +33,7 @@ export function Header() {
             <Plane className="w-8 h-8 text-blue-600" />
             <div>
               <span className="text-xl font-bold text-gray-900">AFEX Travel</span>
-              <span className="hidden sm:inline text-xs text-gray-500 ml-1">(POC Prod)</span>
+              <span className="hidden sm:inline text-xs text-gray-500 ml-1">(POC)</span>
             </div>
           </Link>
 
