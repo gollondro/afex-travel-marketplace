@@ -1,242 +1,268 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { User, Mail, Lock, Phone, Building2, Check, Eye, EyeOff, Plane } from 'lucide-react';
-import { Button, Input, Textarea, Card, Alert } from '@/components/ui';
-import { guidesAPI, GuideRegisterData } from '@/lib/api';
-
-const LANGUAGES = ['Español', 'Inglés', 'Portugués', 'Francés', 'Alemán', 'Italiano', 'Chino', 'Japonés'];
+import { guidesAPI } from '@/lib/api';
 
 export default function GuideRegisterPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [qrUrl, setQrUrl] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const [qrUrl, setQrUrl] = useState('');
 
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
     phone: '',
-    photo_url: '',
     bio: '',
-    languages: [] as string[],
+    languages: '',
     bank_name: '',
     account_type: 'checking' as 'checking' | 'savings',
     account_number: '',
     account_holder: '',
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  }
-
-  function toggleLanguage(lang: string) {
-    setFormData(prev => ({
-      ...prev,
-      languages: prev.languages.includes(lang)
-        ? prev.languages.filter(l => l !== lang)
-        : [...prev.languages, lang],
-    }));
-  }
-
-  function validateForm(): boolean {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) newErrors.name = 'Nombre requerido';
-    if (!formData.email.trim()) newErrors.email = 'Email requerido';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email inválido';
-    if (!formData.password) newErrors.password = 'Contraseña requerida';
-    else if (formData.password.length < 6) newErrors.password = 'Mínimo 6 caracteres';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    if (!formData.phone.trim()) newErrors.phone = 'Teléfono requerido';
-    if (!formData.bank_name.trim()) newErrors.bank_name = 'Banco requerido';
-    if (!formData.account_number.trim()) newErrors.account_number = 'Número de cuenta requerido';
-    if (!formData.account_holder.trim()) newErrors.account_holder = 'Titular requerido';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
-
-  async function handleSubmit(e: FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-    setError(null);
+    setLoading(true);
+    setError('');
 
     try {
-      const registerData: GuideRegisterData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        photo_url: formData.photo_url || undefined,
-        bio: formData.bio || undefined,
-        languages: formData.languages,
+      const data = {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        phone: form.phone,
+        bio: form.bio || undefined,
+        languages: form.languages ? form.languages.split(',').map(l => l.trim()) : [],
         bank_details: {
-          bank_name: formData.bank_name,
-          account_type: formData.account_type,
-          account_number: formData.account_number,
-          account_holder: formData.account_holder,
+          bank_name: form.bank_name,
+          account_type: form.account_type,
+          account_number: form.account_number,
+          account_holder: form.account_holder,
         },
       };
 
-      const response = await guidesAPI.register(registerData);
-      setSuccess(true);
+      const response = await guidesAPI.register(data);
       setQrUrl(response.qr_url);
+      setSuccess(true);
     } catch (err: any) {
-      setError(err.message || 'Error al registrar. Intenta de nuevo.');
+      setError(err.message || 'Error al registrar');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }
+  };
 
-  if (success && qrUrl) {
+  if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
-        <Card className="max-w-md w-full p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-8 h-8 text-green-600" />
-          </div>
-          
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="text-6xl mb-4">🎉</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">¡Registro Exitoso!</h1>
-          <p className="text-gray-600 mb-6">Tu perfil de guía ha sido creado. Comparte tu página con tus clientes para recibir propinas.</p>
-
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-500 mb-2">Tu enlace personal:</p>
-            <p className="text-blue-600 font-medium break-all text-sm">{qrUrl}</p>
+          <p className="text-gray-600 mb-6">Tu perfil de guía ha sido creado.</p>
+          
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-green-800 mb-2">Tu enlace para recibir propinas:</p>
+            <a 
+              href={qrUrl} 
+              target="_blank"
+              className="text-green-600 font-medium break-all hover:underline"
+            >
+              {qrUrl}
+            </a>
           </div>
 
-          <div className="space-y-3">
-            <Button className="w-full" onClick={() => window.open(qrUrl, '_blank')}>Ver mi Página</Button>
-            <Button variant="outline" className="w-full" onClick={() => { navigator.clipboard.writeText(qrUrl); alert('¡Enlace copiado!'); }}>Copiar Enlace</Button>
-            <Link href="/"><Button variant="ghost" className="w-full">Volver al Inicio</Button></Link>
-          </div>
-        </Card>
+          <Link
+            href={qrUrl}
+            className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+          >
+            Ver mi Perfil
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-            <Plane className="w-8 h-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">AFEX Travel</span>
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Registro de Guía</h1>
-          <p className="text-gray-600">Crea tu perfil y comienza a recibir propinas</p>
+          <Link href="/" className="text-2xl font-bold text-green-600">AFEX Go Travel</Link>
+          <h1 className="text-3xl font-bold text-gray-900 mt-4">Registro de Guía</h1>
+          <p className="text-gray-600 mt-2">Crea tu perfil y comienza a recibir propinas</p>
         </div>
 
-        {error && <Alert variant="error" className="mb-6">{error}</Alert>}
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
-        <Card className="p-6 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Información Personal */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">Información Personal</h2>
             
-            {/* Datos Personales */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-4">
-                <User className="w-5 h-5 mr-2 text-blue-600" />
-                Datos Personales
-              </h2>
-              
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input label="Nombre Completo *" name="name" value={formData.name} onChange={handleChange} error={errors.name} placeholder="Juan Pérez" />
-                  <Input label="Teléfono *" name="phone" value={formData.phone} onChange={handleChange} error={errors.phone} placeholder="+56 9 1234 5678" />
-                </div>
-
-                <Input label="Email *" name="email" type="email" value={formData.email} onChange={handleChange} error={errors.email} placeholder="juan@ejemplo.com" />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña *</label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} className={`w-full pl-10 pr-12 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? 'border-red-500' : 'border-gray-300'}`} placeholder="Mínimo 6 caracteres" />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                    {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar *</label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input type={showPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`} placeholder="Repite contraseña" />
-                    </div>
-                    {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
-                  </div>
-                </div>
-
-                <Input label="URL Foto de Perfil (opcional)" name="photo_url" value={formData.photo_url} onChange={handleChange} placeholder="https://ejemplo.com/foto.jpg" />
-                
-                <Textarea label="Biografía (opcional)" name="bio" value={formData.bio} onChange={handleChange} placeholder="Cuéntanos sobre ti..." rows={2} />
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Idiomas</label>
-                  <div className="flex flex-wrap gap-2">
-                    {LANGUAGES.map(lang => (
-                      <button key={lang} type="button" onClick={() => toggleLanguage(lang)} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${formData.languages.includes(lang) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-                        {lang}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Tu nombre"
+              />
             </div>
 
-            <hr />
-
-            {/* Datos Bancarios */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-4">
-                <Building2 className="w-5 h-5 mr-2 text-blue-600" />
-                Datos Bancarios para Recibir Pagos
-              </h2>
-              <p className="text-sm text-gray-500 mb-4">Aquí te depositaremos tus propinas en pesos locales.</p>
-              
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input label="Banco *" name="bank_name" value={formData.bank_name} onChange={handleChange} error={errors.bank_name} placeholder="Banco de Chile" />
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Cuenta *</label>
-                    <select name="account_type" value={formData.account_type} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                      <option value="checking">Cuenta Corriente</option>
-                      <option value="savings">Cuenta de Ahorro</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input label="Número de Cuenta *" name="account_number" value={formData.account_number} onChange={handleChange} error={errors.account_number} placeholder="1234567890" />
-                  <Input label="Titular *" name="account_holder" value={formData.account_holder} onChange={handleChange} error={errors.account_holder} placeholder="Juan Pérez" />
-                </div>
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="tu@email.com"
+              />
             </div>
 
-            <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
-              Crear mi Perfil de Guía
-            </Button>
-          </form>
-        </Card>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña *</label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Mínimo 6 caracteres"
+              />
+            </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          ¿Ya tienes cuenta? <Link href="/login" className="text-blue-600 hover:underline font-medium">Inicia sesión</Link>
-        </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+              <input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="+56 9 1234 5678"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Biografía</label>
+              <textarea
+                name="bio"
+                value={form.bio}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Cuéntanos sobre tu experiencia como guía..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Idiomas</label>
+              <input
+                type="text"
+                name="languages"
+                value={form.languages}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Español, English, Português"
+              />
+              <p className="text-xs text-gray-500 mt-1">Separados por coma</p>
+            </div>
+          </div>
+
+          {/* Datos Bancarios */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">Datos Bancarios</h2>
+            <p className="text-sm text-gray-500">Para recibir tus pagos en moneda local</p>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Banco *</label>
+              <input
+                type="text"
+                name="bank_name"
+                value={form.bank_name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Nombre del banco"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Cuenta *</label>
+              <select
+                name="account_type"
+                value={form.account_type}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="checking">Cuenta Corriente</option>
+                <option value="savings">Cuenta de Ahorro</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Número de Cuenta *</label>
+              <input
+                type="text"
+                name="account_number"
+                value={form.account_number}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="123456789"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Titular de la Cuenta *</label>
+              <input
+                type="text"
+                name="account_holder"
+                value={form.account_holder}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Nombre como aparece en el banco"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50"
+          >
+            {loading ? 'Registrando...' : 'Crear mi Perfil de Guía'}
+          </button>
+
+          <p className="text-center text-sm text-gray-500">
+            ¿Ya tienes cuenta?{' '}
+            <Link href="/login" className="text-green-600 hover:underline">
+              Inicia sesión
+            </Link>
+          </p>
+        </form>
       </div>
     </div>
   );
