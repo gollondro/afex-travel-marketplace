@@ -31,6 +31,7 @@ import userRoutes from './modules/users/routes.js';
 import programRoutes from './modules/programs/routes.js';
 import orderRoutes from './modules/orders/routes.js';
 import paymentRoutes from './modules/payments/routes.js';
+import paymentRoutes from './modules/payments/routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -128,6 +129,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/programs', programRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/guides', guidesRoutes);
 
 // API root
 app.get('/api', (req, res) => {

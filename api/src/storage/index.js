@@ -268,14 +268,14 @@ class Storage {
   }
 
   // Initialize all collections
-  init() {
-    this.guides = new Collection(path.join(this.dataDir, 'guides.json'));
-this.tips = new Collection(path.join(this.dataDir, 'tips.json'));
-this.collections = {
+init() {
+    this.collections = {
       users: new Collection('users', this.dataDir, ['email', 'role']),
       programs: new Collection('programs', this.dataDir, ['agency_id', 'destination']),
       orders: new Collection('orders', this.dataDir, ['agency_id', 'status', 'customer_email']),
-      payments: new Collection('payments', this.dataDir, ['order_id', 'status', 'idempotency_key'])
+      payments: new Collection('payments', this.dataDir, ['order_id', 'status', 'idempotency_key']),
+      guides: new Collection('guides', this.dataDir, ['email', 'status', 'qr_code']),
+      tips: new Collection('tips', this.dataDir, ['guide_id', 'status', 'payment_method'])
     };
     
     console.log(`📁 Storage initialized at: ${this.dataDir}`);
@@ -295,6 +295,8 @@ this.collections = {
   get programs() { return this.get('programs'); }
   get orders() { return this.get('orders'); }
   get payments() { return this.get('payments'); }
+  get guides() { return this.get('guides'); }
+  get tips() { return this.get('tips'); }
 }
 
 // Singleton instance
