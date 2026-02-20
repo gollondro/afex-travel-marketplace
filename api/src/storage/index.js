@@ -269,7 +269,9 @@ class Storage {
 
   // Initialize all collections
   init() {
-    this.collections = {
+    this.guides = new Collection(path.join(this.dataDir, 'guides.json'));
+this.tips = new Collection(path.join(this.dataDir, 'tips.json'));
+this.collections = {
       users: new Collection('users', this.dataDir, ['email', 'role']),
       programs: new Collection('programs', this.dataDir, ['agency_id', 'destination']),
       orders: new Collection('orders', this.dataDir, ['agency_id', 'status', 'customer_email']),

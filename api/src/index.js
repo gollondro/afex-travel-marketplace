@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import guidesRoutes from './modules/guides/routes.js';
 
 // Config
 import config from './config/index.js';
@@ -77,6 +78,7 @@ const authLimiter = rateLimit({
 app.use('/api/', generalLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+app.use('/api/guides', guidesRoutes);
 
 // ==================
 // Body Parsing
