@@ -9,7 +9,6 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import guidesRoutes from './modules/guides/routes.js';
 
 // Config
 import config from './config/index.js';
@@ -31,6 +30,7 @@ import userRoutes from './modules/users/routes.js';
 import programRoutes from './modules/programs/routes.js';
 import orderRoutes from './modules/orders/routes.js';
 import paymentRoutes from './modules/payments/routes.js';
+import guidesRoutes from './modules/guides/routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -78,7 +78,6 @@ const authLimiter = rateLimit({
 app.use('/api/', generalLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
-app.use('/api/guides', guidesRoutes);
 
 // ==================
 // Body Parsing
@@ -142,7 +141,7 @@ app.get('/api', (req, res) => {
       programs: '/api/programs',
       orders: '/api/orders',
       payments: '/api/payments',
-	  guides: '/api/guides'
+      guides: '/api/guides'
     }
   });
 });
