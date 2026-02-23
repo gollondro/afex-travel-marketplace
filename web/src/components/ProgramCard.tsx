@@ -27,7 +27,7 @@ export function ProgramCard({ program }: ProgramCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-            <span className="font-bold text-blue-600">{formatCLP(program.price_clp)}</span>
+            <span className="font-bold text-green-600">{formatCLP(program.price_clp)}</span>
           </div>
         </div>
 
@@ -36,25 +36,25 @@ export function ProgramCard({ program }: ProgramCardProps) {
           <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-2">
             {program.name}
           </h3>
-          
+
           <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-1">
             {program.description}
           </p>
 
           <div className="space-y-2 mt-auto">
             <div className="flex items-center text-sm text-gray-500">
-              <MapPin className="w-4 h-4 mr-1.5 text-blue-500 flex-shrink-0" />
+              <MapPin className="w-4 h-4 mr-1.5 text-green-500 flex-shrink-0" />
               <span className="truncate">{program.destination}</span>
             </div>
-            
+
             <div className="flex items-center text-sm text-gray-500">
-              <Clock className="w-4 h-4 mr-1.5 text-blue-500 flex-shrink-0" />
+              <Clock className="w-4 h-4 mr-1.5 text-green-500 flex-shrink-0" />
               <span>{program.duration}</span>
             </div>
 
             {program.agency_name && (
               <div className="flex items-center text-sm text-gray-500">
-                <Building2 className="w-4 h-4 mr-1.5 text-blue-500 flex-shrink-0" />
+                <Building2 className="w-4 h-4 mr-1.5 text-green-500 flex-shrink-0" />
                 <span className="truncate">{program.agency_name}</span>
               </div>
             )}

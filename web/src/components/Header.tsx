@@ -29,8 +29,7 @@ export function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-		
-            <Plane className="w-8 h-8 text-blue-600" />
+            <Plane className="w-8 h-8 text-green-600" />
             <div>
               <span className="text-xl font-bold text-gray-900">AFEX Travel</span>
               <span className="hidden sm:inline text-xs text-gray-500 ml-1">(POC)</span>
@@ -41,43 +40,43 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link href="/" className="text-gray-600 hover:text-gray-900 font-medium">
               Programas
-            </Link> 
-			
-			<div className="relative group">
-  <button className="text-gray-600 hover:text-gray-900 font-medium">
-    Guías
-  </button>
-  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-    <Link href="/guides/register" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg">
-      Registrarme como Guía
-    </Link>
-    <Link href="/guides/login" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg">
-      Portal de Guías
-    </Link>
-  </div>
-</div>
-            
+            </Link>
+
+            <div className="relative group">
+              <button className="text-gray-600 hover:text-gray-900 font-medium">
+                Guías
+              </button>
+              <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <Link href="/guides/register" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                  Registrarme como Guía
+                </Link>
+                <Link href="/guides/login" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg">
+                  Portal de Guías
+                </Link>
+              </div>
+            </div>
+
             {isAuthenticated ? (
               <>
-                <Link 
-                  href={getDashboardLink()} 
+                <Link
+                  href={getDashboardLink()}
                   className="text-gray-600 hover:text-gray-900 font-medium flex items-center"
                 >
                   <LayoutDashboard className="w-4 h-4 mr-1" />
                   Dashboard
                 </Link>
-                
+
                 <div className="flex items-center space-x-4 pl-4 border-l border-gray-200">
                   <div className="flex items-center">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-green-600" />
                     </div>
                     <div className="ml-2">
                       <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                       <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
                     </div>
                   </div>
-                  
+
                   <Button variant="ghost" size="sm" onClick={handleLogout}>
                     <LogOut className="w-4 h-4 mr-1" />
                     Salir
@@ -121,7 +120,7 @@ export function Header() {
             >
               Programas
             </Link>
-            
+
             {isAuthenticated ? (
               <>
                 <Link
@@ -131,18 +130,18 @@ export function Header() {
                 >
                   Dashboard
                 </Link>
-                
+
                 <div className="border-t border-gray-200 pt-3">
                   <div className="px-3 py-2 flex items-center">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-green-600" />
                     </div>
                     <div className="ml-3">
                       <p className="font-medium text-gray-900">{user?.name}</p>
                       <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
                     </div>
                   </div>
-                  
+
                   <button
                     onClick={() => {
                       handleLogout();
@@ -166,7 +165,7 @@ export function Header() {
                 </Link>
                 <Link
                   href="/register"
-                  className="block px-3 py-2 rounded-lg text-center text-white bg-blue-600 hover:bg-blue-700"
+                  className="block px-3 py-2 rounded-lg text-center text-white bg-green-600 hover:bg-green-700"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Registrarse

@@ -11,7 +11,7 @@ export default function HomePage() {
   const [destinations, setDestinations] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Filters
   const [searchDestination, setSearchDestination] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -70,16 +70,16 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+      <div className="bg-gradient-to-r from-green-600 to-green-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Descubre Chile con AFEX Travel
           </h1>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl">
+          <p className="text-xl text-green-100 mb-8 max-w-2xl">
             Explora los mejores programas turísticos de agencias verificadas.
             Desde la Patagonia hasta el Desierto de Atacama.
           </p>
-          
+
           {/* Search Bar */}
           <div className="bg-white rounded-xl p-4 shadow-lg max-w-3xl">
             <div className="flex flex-col md:flex-row gap-3">
@@ -88,7 +88,7 @@ export default function HomePage() {
                 <select
                   value={searchDestination}
                   onChange={(e) => setSearchDestination(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
                 >
                   <option value="">Todos los destinos</option>
                   {destinations.map((dest) => (
@@ -96,9 +96,9 @@ export default function HomePage() {
                   ))}
                 </select>
               </div>
-              
-              <Button 
-                size="lg" 
+
+              <Button
+                size="lg"
                 onClick={handleFilter}
                 className="md:w-auto w-full"
               >
@@ -122,18 +122,18 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
             >
               <Filter className="w-4 h-4 mr-1" />
               Filtros
             </Button>
-            
+
             {hasActiveFilters && (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={clearFilters}
               >
@@ -155,7 +155,7 @@ export default function HomePage() {
                 <select
                   value={searchDestination}
                   onChange={(e) => setSearchDestination(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                 >
                   <option value="">Todos</option>
                   {destinations.map((dest) => (
@@ -163,7 +163,7 @@ export default function HomePage() {
                   ))}
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Precio máximo (CLP)
@@ -175,7 +175,7 @@ export default function HomePage() {
                   onChange={(e) => setMaxPrice(e.target.value)}
                 />
               </div>
-              
+
               <div className="flex items-end">
                 <Button onClick={handleFilter} className="w-full md:w-auto">
                   Aplicar Filtros

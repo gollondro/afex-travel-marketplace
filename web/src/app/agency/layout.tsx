@@ -3,7 +3,7 @@
 import { useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Plane } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, LogOut, Plane } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { Spinner } from '@/components/ui';
 
@@ -51,7 +51,7 @@ export default function AgencyLayout({ children }: AgencyLayoutProps) {
           {/* Logo */}
           <div className="p-6 border-b border-gray-200">
             <Link href="/" className="flex items-center space-x-2">
-              <Plane className="w-8 h-8 text-blue-600" />
+              <Plane className="w-8 h-8 text-green-600" />
               <div>
                 <span className="text-lg font-bold text-gray-900">AFEX Travel</span>
                 <p className="text-xs text-gray-500">Panel de Agencia</p>
@@ -67,13 +67,11 @@ export default function AgencyLayout({ children }: AgencyLayoutProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`
-                    flex items-center px-4 py-3 rounded-lg transition-colors
-                    ${isActive 
-                      ? 'bg-blue-50 text-blue-700' 
+                  className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-green-50 text-green-700'
                       : 'text-gray-600 hover:bg-gray-50'
-                    }
-                  `}
+                  }`}
                 >
                   <item.icon className="w-5 h-5 mr-3" />
                   {item.label}
@@ -85,8 +83,8 @@ export default function AgencyLayout({ children }: AgencyLayoutProps) {
           {/* User section */}
           <div className="p-4 border-t border-gray-200">
             <div className="flex items-center mb-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-medium">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-green-600 font-medium">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -110,7 +108,7 @@ export default function AgencyLayout({ children }: AgencyLayoutProps) {
       <header className="lg:hidden fixed top-0 inset-x-0 bg-white border-b border-gray-200 z-30">
         <div className="flex items-center justify-between px-4 h-16">
           <Link href="/" className="flex items-center space-x-2">
-            <Plane className="w-6 h-6 text-blue-600" />
+            <Plane className="w-6 h-6 text-green-600" />
             <span className="font-bold text-gray-900">AFEX Travel</span>
           </Link>
           <div className="flex items-center space-x-2">
@@ -120,7 +118,7 @@ export default function AgencyLayout({ children }: AgencyLayoutProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`p-2 rounded-lg ${isActive ? 'bg-blue-100 text-blue-600' : 'text-gray-600'}`}
+                  className={`p-2 rounded-lg ${isActive ? 'bg-green-100 text-green-600' : 'text-gray-600'}`}
                 >
                   <item.icon className="w-5 h-5" />
                 </Link>

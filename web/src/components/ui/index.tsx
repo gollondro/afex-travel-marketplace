@@ -19,7 +19,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
     
     const variants = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+      primary: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
       secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
       outline: 'border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500',
       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
@@ -70,7 +70,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           className={`
             w-full px-3 py-2 border rounded-lg shadow-sm
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
             disabled:bg-gray-100 disabled:cursor-not-allowed
             ${error ? 'border-red-500' : 'border-gray-300'}
             ${className}
@@ -107,7 +107,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           className={`
             w-full px-3 py-2 border rounded-lg shadow-sm
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
             disabled:bg-gray-100 disabled:cursor-not-allowed
             ${error ? 'border-red-500' : 'border-gray-300'}
             ${className}
@@ -144,7 +144,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           className={`
             w-full px-3 py-2 border rounded-lg shadow-sm
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
             disabled:bg-gray-100 disabled:cursor-not-allowed
             ${error ? 'border-red-500' : 'border-gray-300'}
             ${className}
@@ -206,7 +206,7 @@ export function Badge({ children, variant = 'default', className = '' }: BadgePr
     success: 'bg-green-100 text-green-800',
     warning: 'bg-yellow-100 text-yellow-800',
     danger: 'bg-red-100 text-red-800',
-    info: 'bg-blue-100 text-blue-800',
+    info: 'bg-green-100 text-green-800',
   };
 
   return (
@@ -229,7 +229,7 @@ export function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
   return (
     <div className="flex items-center justify-center">
-      <Loader2 className={`${sizes[size]} animate-spin text-blue-600`} />
+      <Loader2 className={`${sizes[size]} animate-spin text-green-600`} />
     </div>
   );
 }
@@ -269,7 +269,7 @@ interface AlertProps {
 
 export function Alert({ variant = 'info', title, children, className = '' }: AlertProps) {
   const variants = {
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    info: 'bg-green-50 border-green-200 text-green-800',
     success: 'bg-green-50 border-green-200 text-green-800',
     warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
     error: 'bg-red-50 border-red-200 text-red-800',
