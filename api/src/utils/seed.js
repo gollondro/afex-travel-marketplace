@@ -84,7 +84,7 @@ async function seed() {
     destination: 'San Pedro de Atacama, Chile',
     duration: '4 días / 3 noches',
     price_clp: 650000,
-    image_url: 'https://images.unsplash.com/photo-1509267025891-a267c8679ae9?w=800'
+    image_url: 'https://images.unsplash.com/photo-1556741495-4a9f3c6935e8?q=80&w=729&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   });
   console.log(`   ✓ Program created: ${program2.name}`);
   // Seed Guides
@@ -181,7 +181,7 @@ for (const guide of guidesData) {
     destination: 'Isla de Pascua, Chile',
     duration: '5 días / 4 noches',
     price_clp: 1450000,
-    image_url: 'https://images.unsplash.com/photo-1558730234-d8b2281b0d00?w=800'
+    image_url: 'https://images.unsplash.com/photo-1671155281453-b345a0a5922a?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   });
   console.log(`   ✓ Program created: ${program4.name}`);
   
